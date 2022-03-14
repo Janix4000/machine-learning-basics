@@ -20,7 +20,7 @@ def get_angle(a1, a2, b1, b2):
 
 def generat_angles(dim, n):
     a1, a2, b1, b2 = rng.uniform(-1, 1, size=(4, n, dim))
-    return get_angle(a1, a2, b1, b2)
+    return get_angle(a1, a2, b1, b2) / np.pi * 2
 
 
 def generate_radius_distances(dim, n):
@@ -36,13 +36,24 @@ def generate_radius_distances(dim, n):
     return np.array(res)
 
 
+def generate_triples(dim, n):
+    a, b, c = rng.uniform(-1, 1, size=(3, n, dim))
+    d_ab = np.linalg.norm(a - b, axis=1)
+    d_ac = np.linalg.norm(a - c, axis=1)
+    res = np.abs(d_ab - d_ac) / (d_ab + d_ac) * 2
+    return res
+
+
 def main():
-    # angles_10 = generat_angles(10, n=10000) / np.pi * 2.0
-    # angles_100 = generat_angles(100, n=10000) / np.pi * 2.0
-    # angles_1000 = generat_angles(1000, n=10000) / np.pi * 2.0
-    angles_10 = generate_radius_distances(10, n=1000)
-    angles_100 = generate_radius_distances(100, n=1000)
-    angles_1000 = generate_radius_distances(1000, n=1000)
+    angles_10 = generat_angles(10, n=10000)
+    angles_100 = generat_angles(100, n=10000)
+    angles_1000 = generat_angles(1000, n=10000)
+    # angles_10 = generate_triples(10, n=10000)
+    # angles_100 = generate_triples(100, n=10000)
+    # angles_1000 = generate_triples(1000, n=10000)
+    # angles_10 = generate_radius_distances(10, n=1000)
+    # angles_100 = generate_radius_distances(100, n=1000)
+    # angles_1000 = generate_radius_distances(1000, n=1000)
     print('Calculated')
 
     fig, axs = plt.subplots(2, 2, figsize=(10, 10), sharex=True)
