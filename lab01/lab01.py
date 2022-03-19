@@ -44,41 +44,72 @@ def generate_triples(dim, n):
     return res
 
 
-def main():
-    angles_10 = generat_angles(10, n=10000)
-    angles_100 = generat_angles(100, n=10000)
-    angles_1000 = generat_angles(1000, n=10000)
-    # angles_10 = generate_triples(10, n=10000)
-    # angles_100 = generate_triples(100, n=10000)
-    # angles_1000 = generate_triples(1000, n=10000)
-    # angles_10 = generate_radius_distances(10, n=1000)
-    # angles_100 = generate_radius_distances(100, n=1000)
-    # angles_1000 = generate_radius_distances(1000, n=1000)
-    print('Calculated')
-
+def create_hist(xss: list, title: str, format: str = '{}', x_label: str = 'values'):
     fig, axs = plt.subplots(2, 2, figsize=(10, 10), sharex=True)
     axs = axs.ravel()
     stacked_ax = axs[-1]
-    x_format = r'%.1f$\cdot\frac{\pi}{2}$'
-    stacked_ax.xaxis.set_major_formatter(ticker.FormatStrFormatter(x_format))
-    xss = [angles_10, angles_100, angles_1000]
+    # x_format = r'%.2f$\cdot\frac{\pi}{2}$'
+
+    stacked_ax.xaxis.set_major_formatter(ticker.FormatStrFormatter(format))
     cs = np.eye(3, 3)
     for ax, c, xs in zip(axs[:3], cs, xss):
         mu = np.mean(xs)
         sigma = np.std(xs)
-        title = fr'$\mu={mu:.2f}\cdot\frac{{\pi}}{{2}}$' + \
-            '\n' + fr'$\sigma={sigma:.2f}\cdot\frac{{\pi}}{{2}}$'
-        ax.xaxis.set_major_formatter(ticker.FormatStrFormatter(x_format))
-        ax.hist(xs, density=True, fc=c, label=title)
+        label = fr'$\mu=$' + \
+            format.format(x=mu) + '\n' + fr'$\sigma=$' + format.format(x=sigma)
+        # ax.xaxis.set_major_formatter(ticker.FormatStrFormatter(format))
+        ax.xaxis.set_major_formatter(ticker.StrMethodFormatter(format))
+        ax.hist(xs, density=True, fc=c, label=label)
         stacked_ax.hist(xs, density=True, fc=(*c, 0.33))
-        ax.set_xlabel("Radians")
+        ax.set_xlabel(x_label)
         ax.set_ylabel("Probability density")
         ax.legend()
 
-    fig.suptitle(
-        'Distributions of the angles between random vectors in the hypercubes.')
-    # plt.legend()
+    fig.suptitle(title)
+
+
+def main():
+    xss = [generat_angles(dim, int(1e5)) for dim in (10, 100, 1000)]
+    title = 'Distributions of the angles between random vectors in the hypercubes.'
+    format = r'{x:.2f}$\cdot\frac{{\pi}}{{2}}$'
+    create_hist(xss, title=title, format=format, x_label='radians')
+    # plt.show()
+
+    xss = [generate_radius_distances(dim, int(1e4)) for dim in (10, 100, 1000)]
+    title = 'Distributions of the percanteges of the points from the hypercube inside the radius of the hyperspheres.'
+    format = r'{x*100:.2f}%'
+    create_hist(xss, title=title, format=format, x_label='percentage')
     plt.show()
+
+    xss = [generate_triples(dim, int(1e5)) for dim in (10, 100, 1000)]
+    title = 'Distributions of the proportions between difference and mean distances between triples of points in the hypercubes.'
+    format = r'{x:.2f}'
+    create_hist(xss, title=title, format=format, x_label='radians')
+    plt.show()
+
+    # fig, axs = plt.subplots(2, 2, figsize=(10, 10), sharex=True)
+    # axs = axs.ravel()
+    # stacked_ax = axs[-1]
+    # x_format = r'%.1f$\cdot\frac{\pi}{2}$'
+    # stacked_ax.xaxis.set_major_formatter(ticker.FormatStrFormatter(x_format))
+    # xss = [angles_10, angles_100, angles_1000]
+    # cs = np.eye(3, 3)
+    # for ax, c, xs in zip(axs[:3], cs, xss):
+    #     mu = np.mean(xs)
+    #     sigma = np.std(xs)
+    #     title = fr'$\mu={mu:.2f}\cdot\frac{{\pi}}{{2}}$' + \
+    #         '\n' + fr'$\sigma={sigma:.2f}\cdot\frac{{\pi}}{{2}}$'
+    #     ax.xaxis.set_major_formatter(ticker.FormatStrFormatter(x_format))
+    #     ax.hist(xs, density=True, fc=c, label=title)
+    #     stacked_ax.hist(xs, density=True, fc=(*c, 0.33))
+    #     ax.set_xlabel("Radians")
+    #     ax.set_ylabel("Probability density")
+    #     ax.legend()
+
+    # fig.suptitle(
+    #     'Distributions of the angles between random vectors in the hypercubes.')
+    # # plt.legend()
+    # plt.show()
 
 
 if __name__ == '__main__':
