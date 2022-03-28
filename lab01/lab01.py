@@ -44,7 +44,7 @@ def generate_triples(dim, n):
     return res
 
 
-def create_hist(xss: list, title: str, format: str = '{}', x_label: str = 'values'):
+def create_hist(xss: list, title: str, format: str = '{}', dims: list=None, x_label: str = 'values'):
     fig, axs = plt.subplots(2, 2, figsize=(10, 10), sharex=True)
     axs = axs.ravel()
     stacked_ax = axs[-1]
@@ -52,65 +52,80 @@ def create_hist(xss: list, title: str, format: str = '{}', x_label: str = 'value
 
     stacked_ax.xaxis.set_major_formatter(ticker.FormatStrFormatter(format))
     cs = np.eye(3, 3)
-    for ax, c, xs in zip(axs[:3], cs, xss):
+    for ax, c, xs, dim in zip(axs[:3], cs, xss, dims):
         mu = np.mean(xs)
         sigma = np.std(xs)
-        label = fr'$\mu=$' + \
+        legend = fr'$\mu=$' + \
             format.format(x=mu) + '\n' + fr'$\sigma=$' + format.format(x=sigma)
         # ax.xaxis.set_major_formatter(ticker.FormatStrFormatter(format))
+        label = f'{xs.shape[0]} points, dim={dim}'
+        ax.set_title(label)
         ax.xaxis.set_major_formatter(ticker.StrMethodFormatter(format))
-        ax.hist(xs, density=True, fc=c, label=label)
+        ax.hist(xs, density=True, fc=c, label=legend)
         stacked_ax.hist(xs, density=True, fc=(*c, 0.33))
         ax.set_xlabel(x_label)
         ax.set_ylabel("Probability density")
         ax.legend()
 
     fig.suptitle(title)
+    return fig
 
-
-def main():
-    xss = [generat_angles(dim, int(1e5)) for dim in (10, 100, 1000)]
-    title = 'Distributions of the angles between random vectors in the hypercubes.'
-    format = r'{x:.2f}$\cdot\frac{{\pi}}{{2}}$'
-    create_hist(xss, title=title, format=format, x_label='radians')
-    # plt.show()
-
-    xss = [generate_radius_distances(dim, int(1e4)) for dim in (10, 100, 1000)]
-    title = 'Distributions of the percanteges of the points from the hypercube inside the radius of the hyperspheres.'
-    format = r'{x*100:.2f}%'
-    create_hist(xss, title=title, format=format, x_label='percentage')
-    plt.show()
-
-    xss = [generate_triples(dim, int(1e5)) for dim in (10, 100, 1000)]
-    title = 'Distributions of the proportions between difference and mean distances between triples of points in the hypercubes.'
-    format = r'{x:.2f}'
-    create_hist(xss, title=title, format=format, x_label='radians')
-    plt.show()
-
-    # fig, axs = plt.subplots(2, 2, figsize=(10, 10), sharex=True)
-    # axs = axs.ravel()
-    # stacked_ax = axs[-1]
-    # x_format = r'%.1f$\cdot\frac{\pi}{2}$'
-    # stacked_ax.xaxis.set_major_formatter(ticker.FormatStrFormatter(x_format))
-    # xss = [angles_10, angles_100, angles_1000]
-    # cs = np.eye(3, 3)
-    # for ax, c, xs in zip(axs[:3], cs, xss):
+def create_bars(xss: list, title: str, format: str = '{}', dims: list=None, x_label: str = 'values'):
+    fig, ax = plt.subplots(figsize=(10, 10), sharex=True)
+    # x_format = r'%.2f$\cdot\frac{\pi}{2}$'
+    
+    mus = np.mean(xss, axis=1)
+    stds = np.std(xss, axis=1)
+    
+    xs = [
+        f'{xs.shape[0]} points, dim={dim}' for xs, dim in zip(xss, dims)
+    ]
+    
+    ax.bar(x=xs, height=mus, yerr=stds)
+    ax.yaxis.set_major_formatter(ticker.StrMethodFormatter(format))
+    ax.set_xlabel('Dimesion')
+    ax.set_ylabel('Mean')
+    # for ax, c, xs, dim in zip(axs[:3], cs, xss, dims):
     #     mu = np.mean(xs)
     #     sigma = np.std(xs)
-    #     title = fr'$\mu={mu:.2f}\cdot\frac{{\pi}}{{2}}$' + \
-    #         '\n' + fr'$\sigma={sigma:.2f}\cdot\frac{{\pi}}{{2}}$'
-    #     ax.xaxis.set_major_formatter(ticker.FormatStrFormatter(x_format))
-    #     ax.hist(xs, density=True, fc=c, label=title)
-    #     stacked_ax.hist(xs, density=True, fc=(*c, 0.33))
-    #     ax.set_xlabel("Radians")
+    #     # legend = fr'$\mu=$' + \
+    #     #     format.format(x=mu) + '\n' + fr'$\sigma=$' + format.format(x=sigma)
+    #     # ax.xaxis.set_major_formatter(ticker.FormatStrFormatter(format))
+    #     label = f'{xs.shape[0]} points, dim={dim}'
+    #     ax.set_title(label)
+    #     ax.xaxis.set_major_formatter(ticker.StrMethodFormatter(format))
+    #     ax.bars(xs, density=True, fc=c, label=legend)
     #     ax.set_ylabel("Probability density")
     #     ax.legend()
 
-    # fig.suptitle(
-    #     'Distributions of the angles between random vectors in the hypercubes.')
-    # # plt.legend()
-    # plt.show()
+    fig.suptitle(title)
+    return fig
 
+def main():
+    dims = [10, 100, 1000]
+    xss = [generat_angles(dim, int(1e4)) for dim in dims]
+    title = 'Distributions of the angles between random vectors in the hypercubes.'
+    format = r'{x:.2f}$\cdot\frac{{\pi}}{{2}}$'
+    # fig = create_hist(xss, title=title, format=format, dims=dims, x_label='radians')
+    title = 'Mean of the angles between random vectors in the hypercubes.'
+    fig = create_bars(xss, title=title, format=format, dims=dims, x_label='radians')
+    plt.show()
+
+    xss = [generate_radius_distances(dim, int(1e3)) for dim in dims]
+    title = 'Distributions of the percanteges of the points from the hypercube inside the radius of the hyperspheres.'
+    format = r'{x:.2f}'
+    # fig = create_hist(xss, title=title, format=format, dims=dims, x_label='proportion')
+    title = 'Mean of the percanteges of the points from the hypercube inside the radius of the hyperspheres..'
+    fig = create_bars(xss, title=title, format=format, dims=dims, x_label='radians')
+    plt.show()
+
+    xss = [generate_triples(dim, int(1e4)) for dim in dims]
+    title = 'Distributions of the proportions between difference and mean distances between triples of points in the hypercubes.'
+    format = r'{x:.2f}'
+    # create_hist(xss, title=title, format=format, dims=dims, x_label='radians')
+    title = 'Mean of the proportions between difference and mean distances between triples of points in the hypercubes..'
+    fig = create_bars(xss, title=title, format=format, dims=dims, x_label='radians')
+    plt.show()
 
 if __name__ == '__main__':
     main()
