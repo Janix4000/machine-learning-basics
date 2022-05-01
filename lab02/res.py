@@ -1,60 +1,76 @@
-from PIL import Image, ImageOps
-from matplotlib import pyplot as plt
-import numpy as np
-from joblib import dump
+# %%
+from itertools import chain
+from joblib import load
 from matplotlib.offsetbox import OffsetImage, AnnotationBbox
 from sklearn.decomposition import PCA
+from math import sqrt, ceil
+from matplotlib import pyplot as plt
+import numpy as np
 
 
-def preprocess_image(image):
-    width, height = image.size
-
-    # Setting the points for cropped image
-    size = min(width, height)
-    left = (width - size) / 2
-    top = (height - size) / 2
-    right = width - (width - size) / 2
-    bottom = height - (height - size) / 2
-
-    # Cropped image of above dimension
-    # (It will not change original image)
-    image = image.crop((left, top, right, bottom))
-    image = ImageOps.grayscale(image)
-    image = image.resize((64, 64))
-    # Shows the image in image viewer
-    return image
-
-
-def prepare_data(n: int):
-    path = './faces'
-    races = ['elf', 'dwarf', 'orc']
-
-    data = []
-
-    for race in races:
-        for i in range(n):
-            filename = f'{path}/{race}/{race}_{i}.png'
-            image = Image.open(filename)
-            image = preprocess_image(image)
-            image = np.array(image)
-            data.append(image.flatten())
-    return np.array(data)
-
-
-data = prepare_data(n=20)
+data = load('./data.joblib')
+pca = load('./pca.joblib')
 mean = np.mean(data, axis=0)
 
-pca = PCA()
-data_r = pca.fit_transform(data)
 
-dump(pca, 'pca.joblib')
-dump(data, 'data.joblib')
-
-# data_r[:, 27:] = 0
-
-# transformed = data_r @ pca.components_
+def best_divs(n: int):
+    a, b = 1, n
+    for i in range(2, int(ceil(sqrt(n)))):
+        if n % i == 0:
+            a, b = i, n // i
+    return a, b
 
 
+def show_images(images, *args, **kwargs):
+    n = len(images)
+    a, b = best_divs(n)
+    fig, axss = plt.subplots(a, b, figsize=(b * 4, a * 4))
+    for im, ax in zip(images, axss.flatten()):
+        ax.imshow(im, *args, **kwargs)
+
+    return fig, axss
+
+# %%
+
+
+def create_reduced(pca, data, dim: int):
+
+    data_r = pca.transform(data)
+
+    data_r[:, dim:] = 0
+    transformed = data_r @ pca.components_ + mean
+
+    fig, axs = show_images(
+        list(
+            map(
+                lambda x: x.reshape(64, 64),
+                pca.components_[:dim]
+            )
+        ),
+        cmap='gray'
+    )
+    fig.savefig(f'res/comps_{dim}.png')
+
+    for i, race in enumerate(['elves', 'dwarfs', 'orcs']):
+        fig, axs = show_images(
+            list(
+                map(
+                    lambda x: x.reshape(64, 64),
+                    chain(
+                        *zip(data[20 * i:20 * (i + 1)], transformed[20 * i:20 * (i + 1)])
+                    )
+                )
+            ),
+            cmap='gray', vmin=0, vmax=255
+        )
+        fig.savefig(f'./res/{race}_{dim}.png')
+
+
+# %%
+
+create_reduced(pca, data, dim=3)
+
+# %%
 # fig, axs = plt.subplots(4, 10)
 # for index, (ax0, ax1) in zip(range(0, 20), axs.reshape(20, 2)):
 #     ax0.imshow(data[index].reshape(64, 64), cmap='gray', vmin=0, vmax=255)
@@ -141,3 +157,4 @@ dump(data, 'data.joblib')
 
 # plt.legend()
 # plt.show()
+# %%
