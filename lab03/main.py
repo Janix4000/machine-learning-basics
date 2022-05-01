@@ -22,7 +22,8 @@ names = [
     "First coord SVM",
     "RBF SVM",
     "Cube SVM",
-    "Partiall linear SVM",
+    "Partially linear SVM",
+    "Quasi cosine SVM",
 ]
 
 
@@ -33,14 +34,27 @@ def part_linear(l, r, R):
     return res
 
 
+def quasi_cosine(l, r):
+    centroid = np.mean(l, axis=0)
+    l = l - centroid
+    r = r - centroid
+    dot = l.dot(r.T)
+    norm = np.linalg.norm(l) * np.linalg.norm(r).reshape(-1, 1)
+    return dot / norm
+
+
 classifiers = [
     LinearSVC(C=0.025),
     SVC(kernel=lambda l, r: l[:, 0].reshape(-1, 1) * r[:, 0].reshape(1, -1)),
     SVC(kernel='rbf', gamma=4, C=1),
     SVC(kernel=lambda l, r: cdist(l, r) < 1),
     SVC(kernel=lambda l, r: part_linear(l, r, R=1)),
+    SVC(kernel=quasi_cosine),
 ]
 
+
+# plt.imshow(quasi_cosine(xy, xy))
+# plt.show()
 
 figure = plt.figure(figsize=(27, 7))
 i = 1
