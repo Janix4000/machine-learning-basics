@@ -9,6 +9,7 @@ class GameState:
     def __init__(self):
         self.state = 'living'
         self.pos = np.array([1, 1])
+        self.board = None
 
 
 next_move = {
@@ -20,10 +21,13 @@ next_move = {
 }
 
 
-def next_game_move(game_state: GameState, board: Board, move: str):
+def next_game_move(game_state: GameState, move: str):
+    board = game_state.board
     state = move
     final_pos = game_state.pos
     fall = 1
+    next_game_state = GameState()
+
     while state != 's':
         next_pos = final_pos + next_move[state]
         next_obstacle = board[next_pos[0]][next_pos[1]]
@@ -37,17 +41,19 @@ def next_game_move(game_state: GameState, board: Board, move: str):
                 fall -= int(next_obstacle)
             elif next_obstacle == '*':
                 state = 's'
-                game_state.state = 'dead'
+                next_game_state.state = 'dead'
             else:
                 state = 's'
-        if game_state.state != 'dead' and fall != 0:
+        if next_game_state.state != 'dead' and fall != 0:
             state = 'd' if fall > 0 else 'u'
             fall -= abs(fall) // fall
 
-    game_state.pos = final_pos
-    if game_state.state != 'dead' and len(board) - 2 == final_pos[0] and len(board[0]) - 2 == final_pos[1]:
-        game_state.state = 'win'
-    return game_state
+    next_game_state.pos = final_pos
+    next_game_state.board = board
+
+    if next_game_state.state != 'dead' and len(board) - 2 == final_pos[0] and len(board[0]) - 2 == final_pos[1]:
+        next_game_state.state = 'win'
+    return next_game_state
 
 
 if __name__ == '__main__':
@@ -61,6 +67,7 @@ if __name__ == '__main__':
     ])
 
     game_state = GameState()
+    game_state.board = board
 
     def print_board(board, pos):
         for idx, row in enumerate(board):
@@ -74,6 +81,6 @@ if __name__ == '__main__':
     print_board(board, game_state.pos)
     while game_state.state == 'living':
         mv = input('Move: ')
-        game_state = next_game_move(game_state, board, mv)
+        game_state = next_game_move(game_state, mv)
         print_board(board, game_state.pos)
     print(game_state.state)

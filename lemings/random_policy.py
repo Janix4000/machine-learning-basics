@@ -2,6 +2,7 @@
 import numpy as np
 from agent_log import create_episodes_moves_mean, create_episodes_score_mean, create_heat_map, create_moves_win, create_res_counter
 from game import GameState
+import game
 from policy import Policy
 from random import choice
 import matplotlib.pyplot as plt
@@ -9,10 +10,11 @@ from collections import Counter
 
 
 class RandomPolicy(Policy):
-    def next_move(self, game_state: GameState):
-        return choice(['l', 'r']), 0
+    def next_state_score(self, game_state: GameState):
+        mv = choice(['l', 'r'])
+        return game.next_game_move(game_state, mv), 0
 
-    def end_agent(game_state: GameState) -> None:
+    def init_agent(game_state: GameState) -> None:
         pass
 
 

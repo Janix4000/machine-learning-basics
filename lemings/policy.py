@@ -8,22 +8,23 @@ import game
 
 class Policy(ABC):
     @abstractmethod
-    def next_move(self, game_state: GameState) -> tuple[str, float]:
+    def next_state_score(self, game_state: GameState) -> tuple[str, float]:
         pass
 
     @abstractmethod
-    def end_agent(game_state: GameState) -> None:
+    def init_agent(game_state: GameState) -> None:
         pass
 
     def run_policy(self, board: game.Board, n_agents: int, n_max_moves: int):
         agents_res = []
         for _ in range(n_agents):
             game_state = game.GameState()
+            game_state.board = board
             n_moves = 0
             agent = AgentLog()
+            self.init_agent(game_state)
             while game_state.state == 'living' and n_moves < n_max_moves:
-                mv, score = self.next_move(game_state)
-                game_state = game.next_game_move(game_state, board, mv)
+                game_state, score = self.next_state_score(game_state)
                 agent.path.append(game_state.pos)
                 agent.scores.append(score)
                 n_moves += 1

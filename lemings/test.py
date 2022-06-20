@@ -3,6 +3,8 @@
 from random_policy import RandomPolicy
 from result_plot import *
 import numpy as np
+
+from sarsa_policy import SarsaPolicy
 # %%
 board = np.array([
     '##########',
@@ -15,13 +17,13 @@ board = np.array([
 
 
 # %%
-
+policies = [SarsaPolicy(board, 15) for _ in range(10)]
 agentss = [policy.run_policy(board, 500, 15)
-           for policy in (RandomPolicy() for _ in range(3))]
+           for policy in policies]
 agentss = np.array(agentss)
 
 # %%
-fig, ax = show_paths(agentss[0], board, n=500)
+fig, ax = show_paths(agentss[0], board, n=20)
 # %%
 fig, ax = show_res_stats(agentss[0])
 # %%

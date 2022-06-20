@@ -10,6 +10,12 @@ class AgentLog:
         self.res: str = None
         self.scores: list[float] = []
 
+    def __str__(self):
+        return f'<{self.res}, {len(self.path)}'
+
+    def __repr__(self):
+        return str(self)
+
 
 def create_heat_map(agents: list[AgentLog], board) -> np.ndarray:
     places_heat_map = np.zeros((len(board), len(board[0])), dtype=int)
