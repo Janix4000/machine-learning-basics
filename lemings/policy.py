@@ -35,4 +35,4 @@ class Policy(ABC):
 
             agents_res.append(agent)
 
-        return agents_res
+        return np.array(agents_res)
