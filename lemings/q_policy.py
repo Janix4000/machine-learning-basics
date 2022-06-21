@@ -9,7 +9,7 @@ import matplotlib.pyplot as plt
 from collections import Counter
 
 
-class SarsaPolicy(Policy):
+class Q_Policy(Policy):
 
     def __init__(self, board, n_max_moves, lr=0.5, df=0.95, er=0.05):
         self.lr = lr
@@ -51,10 +51,8 @@ class SarsaPolicy(Policy):
         self.n_moves += 1
         score = self.score_state(new_game_state)
 
-        next_action = self.choose_action(
-            new_game_state.pos[0], new_game_state.pos[1])
-        next_score = self.q[new_game_state.pos[0],
-                            new_game_state.pos[1], next_action]
+        next_score = np.max(self.q[new_game_state.pos[0],
+                            new_game_state.pos[1]])
 
         self.q[pos[0], pos[1], action] = (
             1 - self.lr) * self.q[pos[0], pos[1], action] + self.lr * (score + self.df * next_score)
@@ -73,7 +71,7 @@ class SarsaPolicy(Policy):
 # %%
 if __name__ == '__main__':
 
-    policy = SarsaPolicy()
+    policy = Q_Policy()
 
     board = np.array([
         '##########',

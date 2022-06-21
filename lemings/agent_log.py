@@ -31,15 +31,20 @@ def create_moves_win(agents: list[AgentLog], n_max_moves=15):
                           for agent in agents if agent.res == 'win')
     moves, wins = np.array(list(win_n_moves.keys())), np.array(
         list(win_n_moves.values()))
-    max_moves = np.max(moves)
     wins_zeros = np.zeros(shape=(n_max_moves + 1,))
-    wins_zeros[moves] = wins
+    if moves.size != 0:
+        wins_zeros[moves] = wins
     return np.arange(0, n_max_moves + 1), wins_zeros
 
 
 def create_res_counter(agents: list[AgentLog]):
     counter = Counter(agent.res for agent in agents)
-    return np.array(list(counter.keys())), np.array(list(counter.values()))
+    for s in ('win', 'dead', 'bored'):
+        if s not in counter:
+            counter[s] = 0
+    stat, count = list(counter.keys()), list(counter.values())
+    stat, count = zip(*sorted(zip(stat, count)))
+    return np.array(list(stat)), np.array(list(count))
 
 
 def moving_average(a, n=3):

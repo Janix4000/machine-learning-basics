@@ -18,10 +18,13 @@ next_move = {
     'r': [+0, +1],
     'u': [-1, +0],
     'd': [+1, +0],
+    'ld': [+1, +1],
+    'rd': [-1, +1],
+    'p': [+0, +0],
 }
 
 
-def next_game_move(game_state: GameState, move: str):
+def next_game_move(game_state: GameState, move: str, rand=0):
     board = game_state.board
     state = move
     final_pos = game_state.pos
@@ -38,7 +41,9 @@ def next_game_move(game_state: GameState, move: str):
             final_pos = next_pos
             if next_obstacle.isdigit():
                 state = 'u'
-                fall -= int(next_obstacle)
+                shift = max(int(next_obstacle) +
+                            np.random.randint(-rand, rand + 1), 0)
+                fall -= shift
             elif next_obstacle == '*':
                 state = 's'
                 next_game_state.state = 'dead'
@@ -64,6 +69,37 @@ if __name__ == '__main__':
         '#..###...#',
         '#***..4..#',
         '##########',
+    ])
+
+    board = np.array([
+        '##############',
+        '#............#',
+        '#.......###..#',
+        '####.....*...#',
+        '#...4447*..**#',
+        '#.........####',
+        '#***.........#',
+        '#######.4*...#',
+        '#............#',
+        '#******......#',
+        '##############',
+    ])
+    board = np.array([
+        '##############',
+        '#............#',
+        '########.#####',
+        '#............#',
+        '#..######.####',
+        '#*........*..#',
+        '#..######.####',
+        '#.........*..#',
+        '#*.######.####',
+        '#.........*..#',
+        '#*.######.####',
+        '#.........*..#',
+        '#.############',
+        '#............#',
+        '##############',
     ])
 
     game_state = GameState()
