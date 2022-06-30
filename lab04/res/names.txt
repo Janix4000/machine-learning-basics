@@ -1,0 +1,11 @@
+[('Alexander Martin Fransson', 'CM'),
+ ('Will Norris', 'GK'),
+ ('Matthew Pearson', 'CB, RB'),
+ ('Victor Christoffer Jensen', 'CAM'),
+ ('Gianni Bruno', 'ST, RM, RW'),
+ ('Casper Terho', 'RW, LW'),
+ ('Oier Luengo Redondo', 'CB, LB'),
+ ('Leon Valentin Schaffran', 'GK'),
+ ('Sergio Villarreal Lozano', 'RB'),
+ ('Benedikt Saller', 'RB, CM, CAM'),
+ ('Omar Hanif Bogle', 'ST')]
