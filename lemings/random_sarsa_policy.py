@@ -8,7 +8,7 @@ import matplotlib.pyplot as plt
 from sarsa_policy import SarsaPolicy
 
 
-class Q_Policy(SarsaPolicy):
+class RandomSarsaPolicy(SarsaPolicy):
 
     def __init__(self, board, n_max_moves, lr=0.5, df=0.95, er=0.05, mvs=None):
         super().__init__(board, n_max_moves, lr, df, er, mvs)
@@ -18,7 +18,7 @@ class Q_Policy(SarsaPolicy):
         action = self.choose_action(pos[0], pos[1])
         mv = self.mvs[action]
 
-        new_game_state = game.next_game_move(game_state, mv)
+        new_game_state = game.next_game_move(game_state, mv, rand=1)
         self.n_moves += 1
         score = self.score_state(new_game_state)
 
@@ -39,7 +39,7 @@ class Q_Policy(SarsaPolicy):
 # %%
 if __name__ == '__main__':
 
-    policy = Q_Policy()
+    policy = RandomSarsaPolicy()
 
     board = np.array([
         '##########',

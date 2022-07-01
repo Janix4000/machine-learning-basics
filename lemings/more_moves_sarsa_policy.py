@@ -1,34 +1,16 @@
 # %%
 import numpy as np
 from agent_log import create_episodes_moves_mean, create_episodes_score_mean, create_heat_map, create_moves_win, create_res_counter
-from game import GameState
-import game
 import matplotlib.pyplot as plt
 
 from sarsa_policy import SarsaPolicy
 
 
-class Q_Policy(SarsaPolicy):
+class MoreMovesSarsaPolicy(SarsaPolicy):
 
-    def __init__(self, board, n_max_moves, lr=0.5, df=0.95, er=0.05, mvs=None):
+    def __init__(self, board, n_max_moves, lr=0.5, df=0.95, er=0.05):
+        mvs = ['l', 'r', 'ld', 'rd', 'p', 's']
         super().__init__(board, n_max_moves, lr, df, er, mvs)
-
-    def next_state_score(self, game_state: GameState):
-        pos = game_state.pos
-        action = self.choose_action(pos[0], pos[1])
-        mv = self.mvs[action]
-
-        new_game_state = game.next_game_move(game_state, mv)
-        self.n_moves += 1
-        score = self.score_state(new_game_state)
-
-        next_score = np.max(self.q[new_game_state.pos[0],
-                            new_game_state.pos[1]])
-
-        self.q[pos[0], pos[1], action] = (
-            1 - self.lr) * self.q[pos[0], pos[1], action] + self.lr * (score + self.df * next_score)
-
-        return new_game_state, score
 
 
 # %%
@@ -39,7 +21,7 @@ class Q_Policy(SarsaPolicy):
 # %%
 if __name__ == '__main__':
 
-    policy = Q_Policy()
+    policy = MoreMovesSarsaPolicy()
 
     board = np.array([
         '##########',

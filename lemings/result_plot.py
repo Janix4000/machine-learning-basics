@@ -17,6 +17,8 @@ def show_results(agentss: list[AgentLog], board, n_max_moves):
     show_moves_mean(agentss, ax=axs[4])
     show_score_mean(agentss, ax=axs[5])
 
+    fig.tight_layout()
+
     return fig, axs
 
 

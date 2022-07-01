@@ -10,11 +10,14 @@ from collections import Counter
 
 
 class RandomPolicy(Policy):
+    def __init__(self, _, __):
+        pass
+
     def next_state_score(self, game_state: GameState):
         mv = choice(['l', 'r'])
         return game.next_game_move(game_state, mv), 0
 
-    def init_agent(game_state: GameState) -> None:
+    def init_agent(self, game_state: GameState) -> None:
         pass
 
 

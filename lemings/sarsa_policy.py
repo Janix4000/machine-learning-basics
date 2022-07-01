@@ -4,19 +4,18 @@ from agent_log import create_episodes_moves_mean, create_episodes_score_mean, cr
 from game import GameState
 import game
 from policy import Policy
-from random import choice
 import matplotlib.pyplot as plt
-from collections import Counter
 
 
 class SarsaPolicy(Policy):
+    def __init__(self, board, n_max_moves, lr=0.5, df=0.95, er=0.05, mvs=None):
+        self.mvs = mvs or ['l', 'r']
 
-    def __init__(self, board, n_max_moves, lr=0.5, df=0.95, er=0.05):
         self.lr = lr
         self.df = df
         self.er = er
 
-        self.q = np.random.rand(len(board), len(board[0]), 2)
+        self.q = np.random.rand(len(board), len(board[0]), len(self.mvs))
 
         self.n_max_moves = n_max_moves
         self.n_moves = 0
@@ -44,8 +43,7 @@ class SarsaPolicy(Policy):
     def next_state_score(self, game_state: GameState):
         pos = game_state.pos
         action = self.choose_action(pos[0], pos[1])
-        mvs = ['l', 'r']
-        mv = mvs[action]
+        mv = self.mvs[action]
 
         new_game_state = game.next_game_move(game_state, mv)
         self.n_moves += 1

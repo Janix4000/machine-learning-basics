@@ -1,4 +1,3 @@
-
 import numpy as np
 
 Board = list[str]
